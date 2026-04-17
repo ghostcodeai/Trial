@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sawti CMS — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Cormorant+Garamond:ital,wght@1,500&family=Noto+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b1120;--panel:#111827;--card:#1a2540;--b:rgba(255,255,255,0.07);--gold:#baaa84;--navy:#2c3d69;--acc:#4f8ef7;--red:#ef4444;--grn:#22c55e;--ylw:#f59e0b;--txt:#e8edf5;--mut:#5a6a8a;--f:'DM Sans',system-ui,sans-serif;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:var(--f);background:var(--bg);color:var(--txt);-webkit-font-smoothing:antialiased;}
+button,input,textarea,select{font-family:var(--f);}
+a{color:inherit;text-decoration:none;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
+
+/* ── LOGIN ─────────────────────────────────────────── */
+#login{position:fixed;inset:0;z-index:9999;background:radial-gradient(ellipse at 40% 40%,rgba(44,61,105,.5) 0%,transparent 60%),var(--bg);display:flex;align-items:center;justify-content:center;}
+.lb{width:400px;padding:2.75rem 2.5rem;background:var(--panel);border:1px solid var(--b);border-radius:22px;box-shadow:0 40px 100px rgba(0,0,0,.7);text-align:center;}
+.lb-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:44px;color:#fff;margin-bottom:4px;line-height:1;}
+.lb-logo em{color:var(--gold);font-style:normal;}
+.lb-sub{font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--mut);margin-bottom:2rem;}
+.lb input{width:100%;padding:12px 16px;border-radius:10px;margin-bottom:1rem;background:rgba(255,255,255,.06);border:1.5px solid var(--b);color:var(--txt);font-size:14px;outline:none;transition:border-color .2s;}
+.lb input:focus{border-color:var(--gold);}
+.lb-btn{width:100%;padding:13px;border-radius:40px;border:none;cursor:pointer;background:var(--navy);color:#fff;font-size:14px;font-weight:600;letter-spacing:.03em;transition:all .2s;}
+.lb-btn:hover{background:var(--gold);color:#0b1120;}
+.lb-err{font-size:12px;color:var(--red);margin-top:.75rem;min-height:18px;}
+
+/* ── APP SHELL ──────────────────────────────────────── */
+#app{display:none;height:100vh;flex-direction:column;}
+
+/* ── TOP BAR ────────────────────────────────────────── */
+.tb{height:54px;display:flex;align-items:center;background:var(--panel);border-bottom:1px solid var(--b);flex-shrink:0;z-index:400;}
+.tb-brand{width:220px;flex-shrink:0;padding:0 1.25rem;display:flex;align-items:center;gap:10px;}
+.tb-logo{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:#fff;white-space:nowrap;}
+.tb-logo em{color:var(--gold);font-style:normal;}
+.tb-tag{font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);}
+.tb-sep{width:1px;height:28px;background:var(--b);flex-shrink:0;}
+.tb-pages{display:flex;align-items:center;gap:3px;padding:0 .75rem;flex:1;overflow-x:auto;scrollbar-width:none;}
+.tb-pages::-webkit-scrollbar{display:none;}
+.ptab{flex-shrink:0;height:34px;padding:0 13px;border-radius:7px;border:none;cursor:pointer;background:none;color:var(--mut);font-size:12px;font-weight:500;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:6px;}
+.ptab:hover{background:rgba(255,255,255,.05);color:var(--txt);}
+.ptab.on{background:rgba(79,142,247,.15);color:var(--acc);}
+.tb-right{display:flex;align-items:center;gap:8px;padding:0 1rem;margin-left:auto;flex-shrink:0;}
+.tb-langrow{display:flex;gap:2px;background:rgba(0,0,0,.25);border-radius:7px;padding:2px;}
+.tb-lang{height:28px;padding:0 10px;border:none;border-radius:5px;cursor:pointer;background:none;color:var(--mut);font-size:11px;font-weight:600;transition:all .15s;}
+.tb-lang.on{background:var(--navy);color:#fff;}
+.dev-row{display:flex;gap:2px;padding:2px;background:rgba(0,0,0,.3);border-radius:7px;}
+.dev{width:28px;height:26px;border-radius:4px;border:none;cursor:pointer;background:none;color:var(--mut);display:flex;align-items:center;justify-content:center;transition:all .15s;font-size:13px;}
+.dev.on{background:rgba(255,255,255,.12);color:var(--txt);}
+.pub-btn{padding:8px 20px;border-radius:20px;border:none;cursor:pointer;background:var(--grn);color:#fff;font-size:12.5px;font-weight:700;transition:all .2s;white-space:nowrap;}
+.pub-btn:hover{background:#16a34a;}
+.pub-ok{font-size:12px;color:var(--grn);display:none;white-space:nowrap;}
+.lo-btn{padding:6px 13px;border-radius:20px;border:1px solid var(--b);background:none;color:var(--mut);cursor:pointer;font-size:12px;transition:all .15s;}
+.lo-btn:hover{border-color:var(--red);color:var(--red);}
+
+/* ── SPLIT ──────────────────────────────────────────── */
+.split{flex:1;display:flex;overflow:hidden;}
+
+/* ── SIDEBAR ────────────────────────────────────────── */
+.sb{width:220px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--b);overflow-y:auto;display:flex;flex-direction:column;}
+.sb-section{padding:.6rem .75rem .25rem;}
+.sb-sh{font-size:8.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);padding:.1rem .5rem .5rem;display:block;}
+.sbn{width:100%;padding:7px 10px;border-radius:8px;border:none;cursor:pointer;background:none;color:var(--mut);font-size:12.5px;font-weight:500;text-align:left;display:flex;align-items:center;gap:8px;transition:all .15s;margin-bottom:2px;}
+.sbn:hover{background:rgba(255,255,255,.05);color:var(--txt);}
+.sbn.on{background:rgba(186,170,132,.12);color:var(--gold);}
+.sbn-ic{width:16px;text-align:center;flex-shrink:0;opacity:.7;font-size:13px;}
+.sb-div{height:1px;background:var(--b);margin:.5rem .75rem;}
+
+/* ── MAIN EDITOR AREA ───────────────────────────────── */
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+.panels{flex:1;overflow-y:auto;}
+.panel{display:none;padding:1.5rem;}
+.panel.on{display:block;}
+
+/* ── PANEL HEADER ───────────────────────────────────── */
+.pnl-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
+.pnl-title{font-size:17px;font-weight:700;color:var(--txt);}
+.pnl-sub{font-size:12px;color:var(--mut);margin-top:2px;}
+.lang-tabs{display:flex;gap:3px;background:rgba(0,0,0,.25);border-radius:9px;padding:3px;}
+.ltab{padding:5px 14px;border-radius:6px;border:none;cursor:pointer;background:none;color:var(--mut);font-size:11.5px;font-weight:600;transition:all .15s;}
+.ltab.on{background:var(--navy);color:#fff;}
+
+/* ── FORM COMPONENTS ────────────────────────────────── */
+.fld{margin-bottom:1rem;}
+.lbl{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);display:block;margin-bottom:5px;}
+.inp,.ta,.sel{width:100%;padding:9px 12px;border-radius:9px;background:rgba(255,255,255,.05);border:1.5px solid var(--b);color:var(--txt);font-size:13px;outline:none;transition:border-color .2s;}
+.inp:focus,.ta:focus,.sel:focus{border-color:var(--gold);}
+.ta{min-height:72px;resize:vertical;line-height:1.55;}
+.sel option{background:var(--card);}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.card{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:1.25rem;margin-bottom:1rem;}
+.card-h{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;}
+
+/* ── BUTTONS ────────────────────────────────────────── */
+.btn-prim{padding:10px 20px;border-radius:9px;border:none;cursor:pointer;background:var(--navy);color:#fff;font-size:13px;font-weight:600;transition:all .2s;}
+.btn-prim:hover{background:var(--acc);}
+.btn-gold{padding:10px 20px;border-radius:9px;border:none;cursor:pointer;background:var(--gold);color:#0b1120;font-size:13px;font-weight:700;transition:all .2s;}
+.btn-gold:hover{filter:brightness(1.1);}
+.btn-ghost{padding:8px 14px;border-radius:8px;border:1.5px solid var(--b);background:none;color:var(--mut);font-size:12.5px;cursor:pointer;transition:all .15s;}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+.btn-danger{padding:8px 14px;border-radius:8px;border:none;background:rgba(239,68,68,.12);color:var(--red);font-size:12.5px;cursor:pointer;font-weight:600;transition:all .15s;}
+.btn-danger:hover{background:var(--red);color:#fff;}
+.btn-sm{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;}
+.btn-add{width:100%;padding:10px;border-radius:9px;border:1.5px dashed rgba(186,170,132,.3);background:none;color:var(--mut);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;margin-top:8px;}
+.btn-add:hover{border-color:var(--gold);color:var(--gold);}
+
+/* ── ARTICLE ROWS ───────────────────────────────────── */
+.art-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.art-item{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:12px;transition:all .15s;}
+.art-item:hover{border-color:rgba(186,170,132,.25);}
+.art-drag{color:var(--mut);cursor:grab;font-size:14px;padding-top:2px;flex-shrink:0;}
+.art-body{flex:1;min-width:0;}
+.art-title{font-size:13px;font-weight:600;color:var(--txt);margin-bottom:3px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.art-meta{font-size:10.5px;color:var(--mut);display:flex;gap:8px;flex-wrap:wrap;}
+.art-tag{padding:1px 7px;border-radius:20px;background:rgba(186,170,132,.12);color:var(--gold);font-size:10px;font-weight:600;}
+.art-actions{display:flex;gap:5px;flex-shrink:0;}
+
+/* ── EDIT MODAL ─────────────────────────────────────── */
+#modal-bg{position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;}
+#modal-bg.vis{display:flex;}
+.modal{width:560px;max-height:90vh;background:var(--panel);border:1px solid rgba(79,142,247,.3);border-radius:18px;box-shadow:0 30px 90px rgba(0,0,0,.8);display:flex;flex-direction:column;overflow:hidden;}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.25rem;border-bottom:1px solid var(--b);flex-shrink:0;}
+.modal-title{font-size:14px;font-weight:700;color:var(--txt);}
+.modal-x{width:26px;height:26px;border-radius:6px;border:none;cursor:pointer;background:rgba(255,255,255,.07);color:var(--mut);font-size:16px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.modal-x:hover{background:var(--red);color:#fff;}
+.modal-body{padding:1.25rem;overflow-y:auto;flex:1;}
+.modal-foot{display:flex;gap:8px;justify-content:flex-end;padding:.9rem 1.25rem;border-top:1px solid var(--b);flex-shrink:0;}
+
+/* ── HEADLINE ROWS ──────────────────────────────────── */
+.hl-list{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
+.hl-item{display:flex;gap:6px;align-items:center;}
+.hl-item .inp{flex:1;}
+.hl-del{width:30px;height:34px;border-radius:7px;border:none;cursor:pointer;background:rgba(239,68,68,.1);color:var(--red);font-size:15px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.hl-del:hover{background:var(--red);color:#fff;}
+
+/* ── IMAGE UPLOAD ───────────────────────────────────── */
+.img-up{width:100%;aspect-ratio:16/7;border:2px dashed rgba(255,255,255,.1);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;overflow:hidden;transition:border-color .2s;background:rgba(0,0,0,.2);}
+.img-up:hover{border-color:var(--gold);}
+.img-up img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.img-up-label{font-size:11.5px;color:var(--mut);text-align:center;pointer-events:none;z-index:1;}
+.img-up input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+
+/* ── STATS DASHBOARD ────────────────────────────────── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem;}
+.stat-card{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:1.25rem;}
+.stat-val{font-size:28px;font-weight:700;color:var(--txt);line-height:1;}
+.stat-lbl{font-size:11px;color:var(--mut);margin-top:4px;}
+.stat-icon{font-size:22px;margin-bottom:.5rem;}
+.activity{background:var(--card);border:1px solid var(--b);border-radius:12px;padding:1.25rem;}
+.act-item{display:flex;align-items:center;gap:10px;padding:.6rem 0;border-bottom:1px solid var(--b);}
+.act-item:last-child{border-bottom:none;}
+.act-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.act-txt{font-size:12.5px;color:var(--txt);flex:1;}
+.act-time{font-size:11px;color:var(--mut);}
+
+/* ── SECTION BADGE ──────────────────────────────────── */
+.sec-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:10.5px;font-weight:600;border:1px solid;margin-bottom:.75rem;}
+
+/* ── PREVIEW FRAME ──────────────────────────────────── */
+.pv{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#0a0f1e;border-left:1px solid var(--b);}
+.pvbar{height:40px;background:rgba(0,0,0,.3);border-bottom:1px solid var(--b);display:flex;align-items:center;padding:0 .75rem;gap:6px;flex-shrink:0;}
+.pv-url{flex:1;padding:4px 10px;border-radius:6px;border:1px solid var(--b);background:rgba(255,255,255,.05);color:var(--mut);font-size:11.5px;outline:none;font-family:monospace;}
+.pv-ib{width:26px;height:26px;border-radius:6px;border:none;cursor:pointer;background:rgba(255,255,255,.06);color:var(--mut);display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s;}
+.pv-ib:hover{background:rgba(255,255,255,.12);color:var(--txt);}
+.pvwrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:0;transition:all .3s;}
+#pv-frame{width:100%;height:100%;border:none;background:white;}
+.pvwrap.tablet{padding:1rem;}
+.pvwrap.tablet #pv-frame{width:768px;border-radius:12px;box-shadow:0 24px 80px rgba(0,0,0,.9);}
+.pvwrap.mobile{padding:1rem;}
+.pvwrap.mobile #pv-frame{width:390px;max-height:844px;border-radius:34px;box-shadow:0 24px 80px rgba(0,0,0,.9);}
+
+/* ── COLOR SWATCH ───────────────────────────────────── */
+.swatch-row{display:flex;gap:8px;align-items:center;margin-bottom:.75rem;}
+.swatch-row input[type=color]{width:40px;height:34px;border:none;border-radius:7px;cursor:pointer;padding:2px;background:transparent;}
+.swatch-lbl{font-size:12.5px;color:var(--txt);flex:1;}
+.swatch-val{font-size:11.5px;color:var(--mut);font-family:monospace;}
+
+/* ── TOAST ──────────────────────────────────────────── */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:var(--grn);color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,.5);transform:translateY(10px);opacity:0;transition:all .3s;pointer-events:none;}
+#toast.show{transform:translateY(0);opacity:1;}
+#toast.err{background:var(--red);}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="lb">
+    <div class="lb-logo"><em>Sawti</em> <span style="color:var(--mut);font-size:28px;">CMS</span></div>
+    <div class="lb-sub">Content Management System</div>
+    <input type="password" id="pw-input" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="lb-btn" onclick="doLogin()">Sign In</button>
+    <div class="lb-err" id="lb-err"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- TOP BAR -->
+  <div class="tb">
+    <div class="tb-brand">
+      <div>
+        <div class="tb-logo"><em>Sawti</em></div>
+        <span class="tb-tag">CMS Studio</span>
+      </div>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tb-pages">
+      <button class="ptab on" data-page="index.html" onclick="switchPage('index.html',this)">🏠 Home</button>
+      <button class="ptab" data-page="about.html" onclick="switchPage('about.html',this)">ℹ️ About</button>
+      <button class="ptab" data-page="contact.html" onclick="switchPage('contact.html',this)">✉️ Contact</button>
+    </div>
+    <div class="tb-right">
+      <div class="tb-langrow">
+        <button class="tb-lang on" data-l="en" onclick="setGlobalLang('en',this)">EN</button>
+        <button class="tb-lang" data-l="ar" onclick="setGlobalLang('ar',this)">AR</button>
+        <button class="tb-lang" data-l="fr" onclick="setGlobalLang('fr',this)">FR</button>
+      </div>
+      <div class="dev-row">
+        <button class="dev on" title="Desktop" onclick="setDevice('desktop',this)">🖥</button>
+        <button class="dev" title="Tablet" onclick="setDevice('tablet',this)">📱</button>
+        <button class="dev" title="Mobile" onclick="setDevice('mobile',this)">📲</button>
+      </div>
+      <button class="pub-btn" onclick="publish()">▲ Publish</button>
+      <span class="pub-ok" id="pub-ok">✓ Published!</span>
+      <button class="lo-btn" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- SPLIT -->
+  <div class="split">
+    <!-- SIDEBAR -->
+    <div class="sb">
+      <div class="sb-section">
+        <span class="sb-sh">Overview</span>
+        <button class="sbn on" onclick="showPanel('p-dash',this)"><span class="sbn-ic">📊</span>Dashboard</button>
+      </div>
+      <div class="sb-div"></div>
+      <div class="sb-section">
+        <span class="sb-sh">Content</span>
+        <button class="sbn" onclick="showPanel('p-hero',this)"><span class="sbn-ic">🎯</span>Hero Section</button>
+        <button class="sbn" onclick="showPanel('p-headlines',this)"><span class="sbn-ic">📰</span>Headlines Ticker</button>
+        <button class="sbn" onclick="showPanel('p-articles',this)"><span class="sbn-ic">📝</span>Articles</button>
+        <button class="sbn" onclick="showPanel('p-cats',this)"><span class="sbn-ic">🏷</span>Categories</button>
+      </div>
+      <div class="sb-div"></div>
+      <div class="sb-section">
+        <span class="sb-sh">Pages</span>
+        <button class="sbn" onclick="showPanel('p-about',this)"><span class="sbn-ic">ℹ️</span>About Page</button>
+        <button class="sbn" onclick="showPanel('p-contact',this)"><span class="sbn-ic">✉️</span>Contact Page</button>
+        <button class="sbn" onclick="showPanel('p-footer',this)"><span class="sbn-ic">🔗</span>Footer</button>
+      </div>
+      <div class="sb-div"></div>
+      <div class="sb-section">
+        <span class="sb-sh">System</span>
+        <button class="sbn" onclick="showPanel('p-design',this)"><span class="sbn-ic">🎨</span>Design</button>
+        <button class="sbn" onclick="showPanel('p-settings',this)"><span class="sbn-ic">⚙️</span>Settings</button>
+      </div>
+    </div>
+
+    <!-- MAIN EDITOR -->
+    <div class="main">
+      <div class="panels">
+
+        <!-- DASHBOARD -->
+        <div class="panel on" id="p-dash">
+          <div class="pnl-hd">
+            <div><div class="pnl-title">Dashboard</div><div class="pnl-sub">Overview of your Sawti content</div></div>
+          </div>
+          <div class="stats-grid" id="dash-stats"></div>
+          <div class="activity">
+            <div class="card-h">Recent Actions</div>
+            <div id="dash-log"><div style="color:var(--mut);font-size:12.5px;padding:.5rem 0;">No actions yet this session.</div></div>
+          </div>
+        </div>
+
+        <!-- HERO -->
+        <div class="panel" id="p-hero">
+          <div class="pnl-hd">
+            <div><div class="pnl-title">Hero Section</div><div class="pnl-sub">Edit the main hero for each language</div></div>
+            <div class="lang-tabs" id="hero-lang-tabs"></div>
+          </div>
+          <div id="hero-forms"></div>
+        </div>
+
+        <!-- HEADLINES -->
+        <div class="panel" id="p-headlines">
+          <div class="pnl-hd">
+            <div><div class="pnl-title">Headlines Ticker</div><div class="pnl-sub">Manage breaking news headlines for each language</div></div>
+            <div class="lang-tabs" id="hl-lang-tabs"></div>
+          </div>
+          <div id="hl-forms"></div>
+        </div>
+
+        <!-- ARTICLES -->
+        <div class="panel" id="p-articles">
+          <div class="pnl-hd">
+            <div><div class="pnl-title">Articles</div><div class="pnl-sub">Add, edit and organise articles per language</div></div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <div class="lang-tabs" id="art-lang-tabs"></div>
+              <button class="btn-gold btn-sm" onclick="openAddArticle()">+ Add Article</button>
+            </div>
+          </div>
+          <div id="art-forms"></div>
+        </div>
+
+        <!-- CATEGORIES -->
+        <div class="panel" id="p-cats">
+          <div class="pnl-hd">
+            <div><div class="pnl-title">Categories</div><div class="pnl-sub">Rename category labels per language</div></div>
+            <div class="lang-tabs" id="cats-lang-tabs"></div>
+          </div>
+          <div id="cats-forms"></div>
+        </div>
+
+        <!-- ABOUT PAGE -->
+        <div class="panel" id="p-about">
+          <div class="pnl-hd">
+            <div><div class="pnl-title">About Page</div><div class="pnl-sub">Edit About Sawti content per language</div></div>
+            <div class="lang-tabs" id="about-lang-tabs"></div>
+          </div>
+          <div id="about-forms"></div>
+        </div>
+
+        <!-- CONTACT PAGE -->
+        <div class="panel" id="p-contact">
+          <div class="pnl-hd">
+            <div><div class="pnl-title">Contact Page</div><div class="pnl-sub">Edit Contact page content per language</div></div>
+            <div class="lang-tabs" id="contact-lang-tabs"></div>
+          </div>
+          <div id="contact-forms"></div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="panel" id="p-footer">
+          <div class="pnl-hd">
+            <div><div class="pnl-title">Footer</div><div class="pnl-sub">Edit footer content per language</div></div>
+            <div class="lang-tabs" id="footer-lang-tabs"></div>
+          </div>
+          <div id="footer-forms"></div>
+        </div>
+
+        <!-- DESIGN -->
+        <div class="panel" id="p-design">
+          <div class="pnl-hd">
+            <div><div class="pnl-title">Design</div><div class="pnl-sub">Customise site colours and typography</div></div>
+          </div>
+          <div class="card">
+            <div class="card-h">Brand Colours</div>
+            <div id="color-rows"></div>
+            <button class="btn-prim" style="margin-top:.5rem;" onclick="applyDesign()">Apply to Preview</button>
+            <button class="btn-ghost" style="margin-top:.5rem;margin-left:8px;" onclick="resetDesign()">Reset Defaults</button>
+          </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="panel" id="p-settings">
+          <div class="pnl-hd">
+            <div><div class="pnl-title">Settings</div><div class="pnl-sub">Site configuration and admin access</div></div>
+          </div>
+          <div class="card">
+            <div class="card-h">Navigation Links</div>
+            <div class="fld"><label class="lbl">Home Label</label><input class="inp" id="s-nav-home" value="Home"></div>
+            <div class="fld"><label class="lbl">About Label</label><input class="inp" id="s-nav-about" value="About Sawti"></div>
+            <div class="fld"><label class="lbl">Contact Label</label><input class="inp" id="s-nav-contact" value="Contact"></div>
+          </div>
+          <div class="card">
+            <div class="card-h">Admin Password</div>
+            <div class="fld"><label class="lbl">Current Password</label><input class="inp" type="password" id="s-pw-cur" placeholder="Enter current password"></div>
+            <div class="fld"><label class="lbl">New Password</label><input class="inp" type="password" id="s-pw-new" placeholder="New password"></div>
+            <div class="fld"><label class="lbl">Confirm New Password</label><input class="inp" type="password" id="s-pw-conf" placeholder="Confirm new password"></div>
+            <button class="btn-prim" onclick="changePassword()">Update Password</button>
+          </div>
+          <div class="card">
+            <div class="card-h" style="color:var(--red);">Danger Zone</div>
+            <button class="btn-danger" onclick="clearCMS()">Reset All CMS Data</button>
+            <p style="font-size:11.5px;color:var(--mut);margin-top:.5rem;">This clears all published overrides and restores default content.</p>
+          </div>
+        </div>
+
+      </div><!-- /panels -->
+    </div><!-- /main -->
+
+    <!-- PREVIEW PANE -->
+    <div class="pv" id="pv-pane">
+      <div class="pvbar">
+        <button class="pv-ib" onclick="reloadFrame()" title="Reload">↺</button>
+        <input class="pv-url" id="pv-url" value="index.html" readonly>
+        <button class="pv-ib" onclick="openInTab()" title="Open in tab">↗</button>
+      </div>
+      <div class="pvwrap" id="pvwrap">
+        <iframe id="pv-frame" src="index.html"></iframe>
+      </div>
+    </div>
+
+  </div><!-- /split -->
+</div><!-- /app -->
+
+<!-- ARTICLE MODAL -->
+<div id="modal-bg">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-title">Add Article</div>
+      <button class="modal-x" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-foot">
+      <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn-gold" onclick="saveArticle()">Save Article</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════
+var PASS_KEY = 'sawti_admin_pass';
+var CMS_KEY  = 'sawti_cms';
+var DESIGN_KEY = 'sawti_design';
+
+var LANGS = ['en','ar','fr'];
+var LANG_LABELS = {en:'English',ar:'العربية',fr:'Français'};
+
+var CAT_KEYS = ['all','news-programs','pictures','authors','legal-advice','media'];
+var CAT_DEFAULTS = {
+  en: ['All','News Programs','Pictures','Authors','Legal advice','Media'],
+  ar: ['الكل','البرامج الإخبارية','الصور','الكتّاب','الاستشارات القانونية','الإعلام'],
+  fr: ['Tout','Programmes','Photos','Auteurs','Conseils juridiques','Médias']
+};
+
+var DESIGN_DEFAULTS = {
+  '--gold':'#baaa84',
+  '--navy':'#2c3d69',
+  '--acc':'#4f8ef7',
+  '--bg-site':'#0b1523',
+  '--ink':'#f0ece2'
+};
+
+var COLOR_LABELS = {
+  '--gold':'Accent Gold',
+  '--navy':'Navy Blue',
+  '--acc':'Link Blue',
+  '--bg-site':'Site Background',
+  '--ink':'Text Color'
+};
+
+// Global state
+var _globalLang = 'en';
+var _editingArticle = null; // { lang, secIdx, cardIdx } or null for new
+var _cms = {}; // local working copy
+
+// Active lang per panel
+var _panelLang = {hero:'en',headlines:'en',articles:'en',cats:'en',about:'en',contact:'en',footer:'en'};
+
+// Section names (used in article editor)
+var SECTION_NAMES = {
+  en: ['English News','Arabic News Section','French News Section'],
+  ar: ['أخبار إنجليزية','قسم الأخبار العربية','قسم الأخبار الفرنسية'],
+  fr: ['Actualités Anglaises','Section Arabe','Section Française']
+};
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+function init() {
+  loadCMS();
+  buildDash();
+  buildHeroForms();
+  buildHlForms();
+  buildArtForms();
+  buildCatsForms();
+  buildAboutForms();
+  buildContactForms();
+  buildFooterForms();
+  buildDesignPanel();
+}
+
+function loadCMS() {
+  try {
+    var raw = localStorage.getItem(CMS_KEY);
+    _cms = raw ? JSON.parse(raw) : {};
+  } catch(e) { _cms = {}; }
+  LANGS.forEach(function(l){ if(!_cms[l]) _cms[l] = {}; });
+}
+
+function saveCMS() {
+  try { localStorage.setItem(CMS_KEY, JSON.stringify(_cms)); } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════════════════
+function doLogin() {
+  var pw = document.getElementById('pw-input').value;
+  var stored = localStorage.getItem(PASS_KEY) || 'sawti2026';
+  if (pw === stored) {
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    init();
+  } else {
+    var e = document.getElementById('lb-err');
+    e.textContent = 'Incorrect password. Try again.';
+    e.style.display = 'block';
+    setTimeout(function(){ e.style.display='none'; e.textContent=''; }, 3000);
+  }
+}
+function logout() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login').style.display = 'flex';
+  document.getElementById('pw-input').value = '';
+}
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+function showPanel(id, btn) {
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('on'); });
+  document.querySelectorAll('.sbn').forEach(function(b){ b.classList.remove('on'); });
+  var p = document.getElementById(id);
+  if (p) p.classList.add('on');
+  if (btn) btn.classList.add('on');
+}
+
+function switchPage(page, btn) {
+  document.querySelectorAll('.ptab').forEach(function(b){ b.classList.remove('on'); });
+  if (btn) btn.classList.add('on');
+  var frame = document.getElementById('pv-frame');
+  frame.src = page;
+  document.getElementById('pv-url').value = page;
+}
+
+function setGlobalLang(l, btn) {
+  _globalLang = l;
+  document.querySelectorAll('.tb-lang').forEach(function(b){ b.classList.remove('on'); });
+  if (btn) btn.classList.add('on');
+  // Reflect in preview
+  var frame = document.getElementById('pv-frame');
+  try {
+    frame.contentWindow.postMessage({type:'setLang',lang:l},'*');
+  } catch(e){}
+}
+
+function setDevice(d, btn) {
+  document.querySelectorAll('.dev').forEach(function(b){ b.classList.remove('on'); });
+  if (btn) btn.classList.add('on');
+  var wrap = document.getElementById('pvwrap');
+  wrap.className = 'pvwrap' + (d !== 'desktop' ? ' '+d : '');
+}
+
+function reloadFrame() {
+  var f = document.getElementById('pv-frame');
+  f.src = f.src;
+}
+function openInTab() {
+  window.open(document.getElementById('pv-url').value, '_blank');
+}
+
+// ═══════════════════════════════════════════════════════
+// PUBLISH
+// ═══════════════════════════════════════════════════════
+function publish() {
+  collectAllForms();
+  saveCMS();
+  // Also apply design
+  applyDesign();
+  var ok = document.getElementById('pub-ok');
+  ok.style.display = 'inline';
+  setTimeout(function(){ ok.style.display='none'; }, 3000);
+  reloadFrame();
+  toast('Changes published!');
+  logAction('Published all changes');
+}
+
+// ═══════════════════════════════════════════════════════
+// COLLECT ALL FORM DATA
+// ═══════════════════════════════════════════════════════
+function collectAllForms() {
+  collectHeroForms();
+  collectHlForms();
+  collectCatsForms();
+  collectAboutForms();
+  collectContactForms();
+  collectFooterForms();
+}
+
+// ═══════════════════════════════════════════════════════
+// LANG TABS HELPER
+// ═══════════════════════════════════════════════════════
+function buildLangTabs(containerId, panelKey, callback) {
+  var c = document.getElementById(containerId);
+  if (!c) return;
+  c.innerHTML = '';
+  LANGS.forEach(function(l) {
+    var btn = document.createElement('button');
+    btn.className = 'ltab' + (l === _panelLang[panelKey] ? ' on' : '');
+    btn.textContent = l.toUpperCase();
+    btn.onclick = function() {
+      _panelLang[panelKey] = l;
+      c.querySelectorAll('.ltab').forEach(function(b){ b.classList.remove('on'); });
+      btn.classList.add('on');
+      callback(l);
+    };
+    c.appendChild(btn);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════
+function buildDash() {
+  var stats = document.getElementById('dash-stats');
+  var totalArts = 0;
+  LANGS.forEach(function(l){
+    var secs = (_cms[l] && _cms[l].sections) || [];
+    secs.forEach(function(s){ totalArts += (s.cards||[]).length; });
+  });
+  stats.innerHTML = [
+    {icon:'📝',val:totalArts,lbl:'Total Articles'},
+    {icon:'🌐',val:3,lbl:'Languages'},
+    {icon:'🏷',val:6,lbl:'Categories'},
+    {icon:'📄',val:3,lbl:'Pages'}
+  ].map(function(s){
+    return '<div class="stat-card"><div class="stat-icon">'+s.icon+'</div><div class="stat-val">'+s.val+'</div><div class="stat-lbl">'+s.lbl+'</div></div>';
+  }).join('');
+}
+
+var _actLog = [];
+function logAction(msg) {
+  var now = new Date();
+  var t = now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+  _actLog.unshift({msg:msg,t:t});
+  if (_actLog.length > 8) _actLog.pop();
+  var el = document.getElementById('dash-log');
+  if (!el) return;
+  el.innerHTML = _actLog.map(function(a){
+    return '<div class="act-item"><div class="act-dot" style="background:var(--grn)"></div><div class="act-txt">'+esc(a.msg)+'</div><div class="act-time">'+a.t+'</div></div>';
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// HERO
+// ═══════════════════════════════════════════════════════
+function buildHeroForms() {
+  buildLangTabs('hero-lang-tabs','hero',function(l){ renderHeroForm(l); });
+  renderHeroForm('en');
+}
+function renderHeroForm(lang) {
+  var d = (_cms[lang] && _cms[lang].hero) || {};
+  var html = '<div class="card"><div class="card-h">Hero — '+LANG_LABELS[lang]+'</div>'+
+    '<div class="fld"><label class="lbl">Hero Image URL</label><input class="inp" id="hero-img-'+lang+'" value="'+esc(d.img||'')+'" placeholder="https://... or local path"></div>'+
+    '<div class="g2">'+
+    '<div class="fld"><label class="lbl">Badge / Label</label><input class="inp" id="hero-badge-'+lang+'" value="'+esc(d.badge||'')+'" placeholder="e.g. Breaking"></div>'+
+    '<div class="fld"><label class="lbl">Date</label><input class="inp" id="hero-date-'+lang+'" value="'+esc(d.date||'')+'" placeholder="e.g. April 2026"></div>'+
+    '</div>'+
+    '<div class="fld"><label class="lbl">Headline Title</label><input class="inp" id="hero-title-'+lang+'" value="'+esc(d.title||'')+'" placeholder="Main headline"></div>'+
+    '<div class="fld"><label class="lbl">Subheadline / Dek</label><textarea class="ta" id="hero-dek-'+lang+'" placeholder="Short description...">'+esc(d.dek||'')+'</textarea></div>'+
+    '<div class="fld"><label class="lbl">CTA Button Text</label><input class="inp" id="hero-cta-'+lang+'" value="'+esc(d.cta||'')+'" placeholder="e.g. Read More"></div>'+
+    '</div>';
+  document.getElementById('hero-forms').innerHTML = html;
+}
+function collectHeroForms() {
+  LANGS.forEach(function(l){
+    var img   = val('hero-img-'+l);
+    var badge = val('hero-badge-'+l);
+    var date  = val('hero-date-'+l);
+    var title = val('hero-title-'+l);
+    var dek   = val('hero-dek-'+l);
+    var cta   = val('hero-cta-'+l);
+    if (img||badge||date||title||dek||cta) {
+      if (!_cms[l]) _cms[l] = {};
+      _cms[l].hero = {img:img,badge:badge,date:date,title:title,dek:dek,cta:cta};
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// HEADLINES
+// ═══════════════════════════════════════════════════════
+function buildHlForms() {
+  buildLangTabs('hl-lang-tabs','headlines',function(l){ renderHlForm(l); });
+  renderHlForm('en');
+}
+function renderHlForm(lang) {
+  var items = (_cms[lang] && _cms[lang].headlines) || [];
+  var rows = items.map(function(h,i){
+    return '<div class="hl-item"><input class="inp" id="hl-'+lang+'-'+i+'" value="'+esc(h)+'"><button class="hl-del" onclick="removeHl(\''+lang+'\','+i+')">✕</button></div>';
+  }).join('');
+  document.getElementById('hl-forms').innerHTML =
+    '<div class="card"><div class="card-h">Headlines — '+LANG_LABELS[lang]+' <span style="color:var(--mut);font-weight:400;font-size:11px;">(scroll ticker at top)</span></div>'+
+    '<div class="hl-list" id="hl-list-'+lang+'">'+rows+'</div>'+
+    '<button class="btn-add" onclick="addHl(\''+lang+'\')">+ Add Headline</button>'+
+    '</div>';
+}
+function addHl(lang) {
+  if (!_cms[lang]) _cms[lang] = {};
+  if (!_cms[lang].headlines) _cms[lang].headlines = [];
+  _cms[lang].headlines.push('');
+  renderHlForm(lang);
+}
+function removeHl(lang, idx) {
+  if (_cms[lang] && _cms[lang].headlines) {
+    _cms[lang].headlines.splice(idx,1);
+    renderHlForm(lang);
+  }
+}
+function collectHlForms() {
+  LANGS.forEach(function(l){
+    var items = [];
+    var i = 0;
+    while (true) {
+      var el = document.getElementById('hl-'+l+'-'+i);
+      if (!el) break;
+      var v = el.value.trim();
+      if (v) items.push(v);
+      i++;
+    }
+    if (items.length) {
+      if (!_cms[l]) _cms[l] = {};
+      _cms[l].headlines = items;
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// ARTICLES
+// ═══════════════════════════════════════════════════════
+function buildArtForms() {
+  buildLangTabs('art-lang-tabs','articles',function(l){ renderArtList(l); });
+  renderArtList('en');
+}
+
+function renderArtList(lang) {
+  var secs = (_cms[lang] && _cms[lang].sections) || [];
+  var html = '';
+  if (!secs.length) {
+    html = '<div class="card"><p style="color:var(--mut);font-size:13px;">No articles yet for '+LANG_LABELS[lang]+'. Click "+ Add Article" to get started.</p></div>';
+  } else {
+    secs.forEach(function(sec, si) {
+      html += '<div class="card" style="margin-bottom:1rem;">';
+      html += '<div class="card-h">'+esc(sec.title||'Section '+(si+1))+'<button class="btn-ghost btn-sm" onclick="addArticleToSection(\''+lang+'\','+si+')">+ Article</button></div>';
+      if (sec.featured) {
+        html += '<div class="art-item" style="border-color:rgba(186,170,132,.3);margin-bottom:8px;">'+
+          '<div class="art-body">'+
+          '<div class="art-title">⭐ '+esc(sec.featured.title||'(untitled featured)')+'</div>'+
+          '<div class="art-meta"><span class="art-tag">Featured</span><span>'+esc(sec.featured.catKey||'')+'</span></div>'+
+          '</div>'+
+          '<div class="art-actions">'+
+          '<button class="btn-prim btn-sm xs-e" onclick="editFeatured(\''+lang+'\','+si+')">Edit</button>'+
+          '<button class="btn-danger btn-sm" onclick="deleteFeatured(\''+lang+'\','+si+')">Del</button>'+
+          '</div></div>';
+      }
+      var cards = sec.cards || [];
+      if (cards.length) {
+        html += '<div class="art-list">';
+        cards.forEach(function(c, ci) {
+          html += '<div class="art-item">'+
+            '<div class="art-body">'+
+            '<div class="art-title">'+esc(c.title||'(untitled)')+'</div>'+
+            '<div class="art-meta"><span class="art-tag">'+esc(c.catKey||'media')+'</span><span>'+esc(c.date||'')+'</span></div>'+
+            '</div>'+
+            '<div class="art-actions">'+
+            '<button class="btn-prim btn-sm xs-e" onclick="editArticle(\''+lang+'\','+si+','+ci+')">Edit</button>'+
+            '<button class="btn-danger btn-sm" onclick="deleteArticle(\''+lang+'\','+si+','+ci+')">Del</button>'+
+            '</div></div>';
+        });
+        html += '</div>';
+      } else {
+        html += '<p style="font-size:12px;color:var(--mut);padding:.25rem 0;">No cards in this section.</p>';
+      }
+      html += '</div>';
+    });
+    html += '<button class="btn-add" onclick="addSection(\''+lang+'\')">+ Add Section</button>';
+  }
+  document.getElementById('art-forms').innerHTML = html;
+}
+
+function addSection(lang) {
+  if (!_cms[lang]) _cms[lang] = {};
+  if (!_cms[lang].sections) _cms[lang].sections = [];
+  _cms[lang].sections.push({title:'New Section',cards:[],featured:null});
+  renderArtList(lang);
+  logAction('Added new section in '+lang.toUpperCase());
+}
+
+function openAddArticle() {
+  var l = _panelLang.articles;
+  _editingArticle = {lang:l, secIdx:-1, cardIdx:-1, mode:'new'};
+  openModal('Add Article', buildArticleForm(l, null, false));
+}
+function addArticleToSection(lang, si) {
+  _editingArticle = {lang:lang, secIdx:si, cardIdx:-1, mode:'new-to-sec'};
+  openModal('Add Article to Section', buildArticleForm(lang, null, false, si));
+}
+function editArticle(lang, si, ci) {
+  var card = _cms[lang].sections[si].cards[ci];
+  _editingArticle = {lang:lang, secIdx:si, cardIdx:ci, mode:'edit'};
+  openModal('Edit Article', buildArticleForm(lang, card, false, si));
+}
+function editFeatured(lang, si) {
+  var feat = _cms[lang].sections[si].featured;
+  _editingArticle = {lang:lang, secIdx:si, cardIdx:-1, mode:'edit-featured'};
+  openModal('Edit Featured Article', buildArticleForm(lang, feat, true, si));
+}
+function deleteFeatured(lang, si) {
+  if (confirm('Delete this featured article?')) {
+    _cms[lang].sections[si].featured = null;
+    renderArtList(lang);
+    logAction('Deleted featured article in '+lang.toUpperCase());
+  }
+}
+function deleteArticle(lang, si, ci) {
+  if (confirm('Delete this article?')) {
+    _cms[lang].sections[si].cards.splice(ci, 1);
+    renderArtList(lang);
+    logAction('Deleted article in '+lang.toUpperCase());
+  }
+}
+
+function buildArticleForm(lang, card, isFeatured, si) {
+  card = card || {};
+  var secs = (_cms[lang] && _cms[lang].sections) || [];
+  var secOpts = secs.map(function(s,i){
+    return '<option value="'+i+'"'+(i===si?' selected':'')+'>'+esc(s.title||'Section '+(i+1))+'</option>';
+  }).join('');
+  var catOpts = CAT_KEYS.slice(1).map(function(k,i){
+    return '<option value="'+k+'"'+(card.catKey===k?' selected':'')+'>'+esc(CAT_DEFAULTS.en[i+1])+' ('+k+')</option>';
+  }).join('');
+  return '<div class="fld"><label class="lbl">Title</label><input class="inp" id="ma-title" value="'+esc(card.title||'')+'" placeholder="Article title"></div>'+
+    '<div class="fld"><label class="lbl">Category</label><select class="sel" id="ma-cat"><option value="">-- select --</option>'+catOpts+'</select></div>'+
+    '<div class="g2"><div class="fld"><label class="lbl">Author / Source</label><input class="inp" id="ma-auth" value="'+esc(card.author||'')+'" placeholder="Author name"></div>'+
+    '<div class="fld"><label class="lbl">Date</label><input class="inp" id="ma-date" value="'+esc(card.date||'')+'" placeholder="e.g. 14 Apr 2026"></div></div>'+
+    '<div class="fld"><label class="lbl">Excerpt / Summary</label><textarea class="ta" id="ma-dek" placeholder="Short description...">'+esc(card.dek||'')+'</textarea></div>'+
+    '<div class="fld"><label class="lbl">Image URL</label><input class="inp" id="ma-img" value="'+esc(card.img||'')+'" placeholder="https://... or local path"></div>'+
+    (isFeatured ? '' : '<div class="fld"><label class="lbl">Section</label><select class="sel" id="ma-sec">'+secOpts+'</select></div>')+
+    '<div class="fld"><label class="lbl" style="display:flex;align-items:center;gap:8px;cursor:pointer;"><input type="checkbox" id="ma-feat"'+(isFeatured?' checked':'')+' style="width:15px;height:15px;"> Make Featured Article in Section</label></div>';
+}
+
+function saveArticle() {
+  var e = _editingArticle;
+  if (!e) return;
+  var card = {
+    title: val('ma-title'),
+    catKey: val('ma-cat') || 'media',
+    author: val('ma-auth'),
+    date: val('ma-date'),
+    dek: val('ma-dek'),
+    img: val('ma-img')
+  };
+  if (!card.title) { toast('Please enter a title.','err'); return; }
+  var lang = e.lang;
+  var isFeat = document.getElementById('ma-feat') && document.getElementById('ma-feat').checked;
+  var si = e.secIdx;
+  if (e.mode === 'new' || e.mode === 'new-to-sec') {
+    var selSec = document.getElementById('ma-sec');
+    si = selSec ? parseInt(selSec.value) : 0;
+    if (!_cms[lang]) _cms[lang] = {};
+    if (!_cms[lang].sections) _cms[lang].sections = [];
+    if (si < 0 || si >= _cms[lang].sections.length) {
+      _cms[lang].sections.push({title:'New Section',cards:[],featured:null});
+      si = _cms[lang].sections.length - 1;
+    }
+  }
+  if (isFeat) {
+    _cms[lang].sections[si].featured = card;
+  } else {
+    if (e.mode === 'edit' && e.cardIdx >= 0) {
+      _cms[lang].sections[si].cards[e.cardIdx] = card;
+    } else if (e.mode === 'edit-featured') {
+      _cms[lang].sections[si].featured = null;
+      _cms[lang].sections[si].cards.push(card);
+    } else {
+      _cms[lang].sections[si].cards.push(card);
+    }
+  }
+  closeModal();
+  renderArtList(lang);
+  logAction((e.mode.indexOf('edit')>=0?'Updated':'Added')+' article: '+card.title+' ['+lang.toUpperCase()+']');
+  toast('Article saved!');
+}
+
+// ═══════════════════════════════════════════════════════
+// CATEGORIES
+// ═══════════════════════════════════════════════════════
+function buildCatsForms() {
+  buildLangTabs('cats-lang-tabs','cats',function(l){ renderCatsForm(l); });
+  renderCatsForm('en');
+}
+function renderCatsForm(lang) {
+  var cats = (_cms[lang] && _cms[lang].cats) || CAT_DEFAULTS[lang];
+  var rows = CAT_KEYS.map(function(k,i){
+    return '<div class="fld"><label class="lbl">'+k+'</label><input class="inp" id="cat-'+lang+'-'+i+'" value="'+esc(cats[i]||k)+'"></div>';
+  }).join('');
+  document.getElementById('cats-forms').innerHTML =
+    '<div class="card"><div class="card-h">Category Labels — '+LANG_LABELS[lang]+'</div>'+rows+
+    '<button class="btn-prim" onclick="saveCatsForm(\''+lang+'\')">Save Categories</button></div>';
+}
+function saveCatsForm(lang) {
+  var cats = CAT_KEYS.map(function(k,i){ return val('cat-'+lang+'-'+i); });
+  if (!_cms[lang]) _cms[lang] = {};
+  _cms[lang].cats = cats;
+  toast('Categories saved for '+lang.toUpperCase());
+  logAction('Updated categories ['+lang.toUpperCase()+']');
+}
+function collectCatsForms() {
+  LANGS.forEach(function(l){
+    var cats = [];
+    var ok = false;
+    CAT_KEYS.forEach(function(k,i){
+      var v = val('cat-'+l+'-'+i);
+      cats.push(v);
+      if (v) ok = true;
+    });
+    if (ok) { if(!_cms[l]) _cms[l]={}; _cms[l].cats = cats; }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// ABOUT PAGE
+// ═══════════════════════════════════════════════════════
+function buildAboutForms() {
+  buildLangTabs('about-lang-tabs','about',function(l){ renderAboutForm(l); });
+  renderAboutForm('en');
+}
+function renderAboutForm(lang) {
+  var d = (_cms[lang] && _cms[lang].aboutPage) || {};
+  document.getElementById('about-forms').innerHTML =
+    '<div class="card"><div class="card-h">Page Header — '+LANG_LABELS[lang]+'</div>'+
+    '<div class="g2">'+
+    '<div class="fld"><label class="lbl">Page Tag</label><input class="inp" id="ab-tag-'+lang+'" value="'+esc(d.tag||'')+'" placeholder="e.g. Our Story"></div>'+
+    '<div class="fld"><label class="lbl">Page Title</label><input class="inp" id="ab-title-'+lang+'" value="'+esc(d.title||'')+'" placeholder="About Sawti"></div>'+
+    '</div>'+
+    '<div class="fld"><label class="lbl">Subtitle</label><textarea class="ta" id="ab-sub-'+lang+'">'+esc(d.subtitle||'')+'</textarea></div>'+
+    '</div>'+
+    '<div class="card"><div class="card-h">Mission Section</div>'+
+    '<div class="fld"><label class="lbl">Mission Title</label><input class="inp" id="ab-mis-title-'+lang+'" value="'+esc(d.missionTitle||'')+'" placeholder="Our Mission"></div>'+
+    '<div class="fld"><label class="lbl">Mission Paragraph 1</label><textarea class="ta" id="ab-mis-p1-'+lang+'">'+esc(d.missionP1||'')+'</textarea></div>'+
+    '<div class="fld"><label class="lbl">Mission Paragraph 2</label><textarea class="ta" id="ab-mis-p2-'+lang+'">'+esc(d.missionP2||'')+'</textarea></div>'+
+    '</div>'+
+    '<div class="card"><div class="card-h">Values Section Title</div>'+
+    '<div class="fld"><label class="lbl">Section Title</label><input class="inp" id="ab-val-title-'+lang+'" value="'+esc(d.valuesTitle||'')+'" placeholder="Our Values"></div>'+
+    '</div>'+
+    '<div class="card"><div class="card-h">What We Cover Title</div>'+
+    '<div class="fld"><label class="lbl">Section Title</label><input class="inp" id="ab-cov-title-'+lang+'" value="'+esc(d.coversTitle||'')+'" placeholder="What We Cover"></div>'+
+    '</div>'+
+    '<div class="card"><div class="card-h">Team Section Title</div>'+
+    '<div class="fld"><label class="lbl">Section Title</label><input class="inp" id="ab-team-title-'+lang+'" value="'+esc(d.teamTitle||'')+'" placeholder="Our Team"></div>'+
+    '</div>'+
+    '<button class="btn-gold" onclick="saveAboutForm(\''+lang+'\')">Save About Page</button>';
+}
+function saveAboutForm(lang) {
+  if (!_cms[lang]) _cms[lang] = {};
+  _cms[lang].aboutPage = {
+    tag: val('ab-tag-'+lang), title: val('ab-title-'+lang), subtitle: val('ab-sub-'+lang),
+    missionTitle: val('ab-mis-title-'+lang), missionP1: val('ab-mis-p1-'+lang), missionP2: val('ab-mis-p2-'+lang),
+    valuesTitle: val('ab-val-title-'+lang), coversTitle: val('ab-cov-title-'+lang), teamTitle: val('ab-team-title-'+lang)
+  };
+  saveCMS();
+  toast('About page saved for '+lang.toUpperCase());
+  logAction('Updated About page ['+lang.toUpperCase()+']');
+}
+function collectAboutForms() {
+  LANGS.forEach(function(l){ saveAboutForm(l); });
+}
+
+// ═══════════════════════════════════════════════════════
+// CONTACT PAGE
+// ═══════════════════════════════════════════════════════
+function buildContactForms() {
+  buildLangTabs('contact-lang-tabs','contact',function(l){ renderContactForm(l); });
+  renderContactForm('en');
+}
+function renderContactForm(lang) {
+  var d = (_cms[lang] && _cms[lang].contactPage) || {};
+  document.getElementById('contact-forms').innerHTML =
+    '<div class="card"><div class="card-h">Page Header — '+LANG_LABELS[lang]+'</div>'+
+    '<div class="g2">'+
+    '<div class="fld"><label class="lbl">Page Tag</label><input class="inp" id="ct-tag-'+lang+'" value="'+esc(d.tag||'')+'" placeholder="Get In Touch"></div>'+
+    '<div class="fld"><label class="lbl">Page Title</label><input class="inp" id="ct-title-'+lang+'" value="'+esc(d.title||'')+'" placeholder="Contact Sawti"></div>'+
+    '</div>'+
+    '<div class="fld"><label class="lbl">Subtitle</label><textarea class="ta" id="ct-sub-'+lang+'">'+esc(d.subtitle||'')+'</textarea></div>'+
+    '</div>'+
+    '<div class="card"><div class="card-h">Info Cards</div>'+
+    '<div class="fld"><label class="lbl">Headquarters Title</label><input class="inp" id="ct-hq-title-'+lang+'" value="'+esc(d.hqTitle||'')+'" placeholder="Headquarters"></div>'+
+    '<div class="fld"><label class="lbl">Headquarters Address</label><textarea class="ta" id="ct-hq-addr-'+lang+'">'+esc(d.hqAddr||'')+'</textarea></div>'+
+    '<div class="fld"><label class="lbl">Response Time Text</label><textarea class="ta" id="ct-resp-'+lang+'">'+esc(d.responseTime||'')+'</textarea></div>'+
+    '</div>'+
+    '<button class="btn-gold" onclick="saveContactForm(\''+lang+'\')">Save Contact Page</button>';
+}
+function saveContactForm(lang) {
+  if (!_cms[lang]) _cms[lang] = {};
+  _cms[lang].contactPage = {
+    tag: val('ct-tag-'+lang), title: val('ct-title-'+lang), subtitle: val('ct-sub-'+lang),
+    hqTitle: val('ct-hq-title-'+lang), hqAddr: val('ct-hq-addr-'+lang),
+    responseTime: val('ct-resp-'+lang)
+  };
+  saveCMS();
+  toast('Contact page saved for '+lang.toUpperCase());
+  logAction('Updated Contact page ['+lang.toUpperCase()+']');
+}
+function collectContactForms() {
+  LANGS.forEach(function(l){ saveContactForm(l); });
+}
+
+// ═══════════════════════════════════════════════════════
+// FOOTER
+// ═══════════════════════════════════════════════════════
+function buildFooterForms() {
+  buildLangTabs('footer-lang-tabs','footer',function(l){ renderFooterForm(l); });
+  renderFooterForm('en');
+}
+function renderFooterForm(lang) {
+  var d = (_cms[lang] && _cms[lang].footer) || {};
+  document.getElementById('footer-forms').innerHTML =
+    '<div class="card"><div class="card-h">Footer — '+LANG_LABELS[lang]+'</div>'+
+    '<div class="fld"><label class="lbl">Tagline</label><textarea class="ta" id="ft-tagline-'+lang+'">'+esc(d.tagline||'')+'</textarea></div>'+
+    '<div class="fld"><label class="lbl">Address (HTML allowed)</label><textarea class="ta" id="ft-address-'+lang+'">'+esc(d.address||'')+'</textarea></div>'+
+    '<div class="g2">'+
+    '<div class="fld"><label class="lbl">Email</label><input class="inp" id="ft-email-'+lang+'" value="'+esc(d.email||'')+'" placeholder="info@sawti.eu"></div>'+
+    '<div class="fld"><label class="lbl">Copyright Line</label><input class="inp" id="ft-copy-'+lang+'" value="'+esc(d.copy||'')+'" placeholder="© 2026 Sawti."></div>'+
+    '</div>'+
+    '<div class="fld"><label class="lbl">Motto</label><input class="inp" id="ft-motto-'+lang+'" value="'+esc(d.motto||'')+'" placeholder="Because silence is not an option."></div>'+
+    '<button class="btn-prim" onclick="saveFooterForm(\''+lang+'\')">Save Footer</button></div>';
+}
+function saveFooterForm(lang) {
+  if (!_cms[lang]) _cms[lang] = {};
+  _cms[lang].footer = {
+    tagline: val('ft-tagline-'+lang), address: val('ft-address-'+lang),
+    email: val('ft-email-'+lang), copy: val('ft-copy-'+lang), motto: val('ft-motto-'+lang)
+  };
+  saveCMS();
+  toast('Footer saved for '+lang.toUpperCase());
+  logAction('Updated footer ['+lang.toUpperCase()+']');
+}
+function collectFooterForms() {
+  LANGS.forEach(function(l){ saveFooterForm(l); });
+}
+
+// ═══════════════════════════════════════════════════════
+// DESIGN
+// ═══════════════════════════════════════════════════════
+function buildDesignPanel() {
+  var stored = {};
+  try { stored = JSON.parse(localStorage.getItem(DESIGN_KEY)||'{}'); } catch(e){}
+  var html = Object.keys(DESIGN_DEFAULTS).map(function(k){
+    var current = stored[k] || DESIGN_DEFAULTS[k];
+    return '<div class="swatch-row">'+
+      '<input type="color" id="d-'+k.replace(/-/g,'_')+'" value="'+current+'" onchange="previewColor(\''+k+'\',this.value)">'+
+      '<span class="swatch-lbl">'+COLOR_LABELS[k]+'</span>'+
+      '<span class="swatch-val">'+current+'</span>'+
+      '</div>';
+  }).join('');
+  document.getElementById('color-rows').innerHTML = html;
+}
+function previewColor(varName, val) {
+  // update swatch-val display
+  var id = 'd-'+varName.replace(/-/g,'_');
+  var row = document.getElementById(id);
+  if (row) row.nextElementSibling.nextElementSibling.textContent = val;
+}
+function applyDesign() {
+  var d = {};
+  Object.keys(DESIGN_DEFAULTS).forEach(function(k){
+    var el = document.getElementById('d-'+k.replace(/-/g,'_'));
+    if (el) d[k] = el.value;
+  });
+  try { localStorage.setItem(DESIGN_KEY, JSON.stringify(d)); } catch(e){}
+  // Inject into preview iframe
+  var frame = document.getElementById('pv-frame');
+  try {
+    var css = Object.keys(d).map(function(k){ return k+':'+d[k]; }).join(';');
+    frame.contentWindow.document.documentElement.style.cssText += ';'+css;
+  } catch(e){}
+  toast('Design applied!');
+  logAction('Updated design colours');
+}
+function resetDesign() {
+  Object.keys(DESIGN_DEFAULTS).forEach(function(k){
+    var el = document.getElementById('d-'+k.replace(/-/g,'_'));
+    if (el) { el.value = DESIGN_DEFAULTS[k]; previewColor(k, DESIGN_DEFAULTS[k]); }
+  });
+  localStorage.removeItem(DESIGN_KEY);
+  toast('Design reset to defaults');
+}
+
+// ═══════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════
+function changePassword() {
+  var cur  = document.getElementById('s-pw-cur').value;
+  var nw   = document.getElementById('s-pw-new').value;
+  var conf = document.getElementById('s-pw-conf').value;
+  var stored = localStorage.getItem(PASS_KEY) || 'sawti2026';
+  if (cur !== stored) { toast('Current password is incorrect.','err'); return; }
+  if (!nw) { toast('New password cannot be empty.','err'); return; }
+  if (nw !== conf) { toast('Passwords do not match.','err'); return; }
+  localStorage.setItem(PASS_KEY, nw);
+  document.getElementById('s-pw-cur').value = '';
+  document.getElementById('s-pw-new').value = '';
+  document.getElementById('s-pw-conf').value = '';
+  toast('Password updated!');
+  logAction('Admin password changed');
+}
+function clearCMS() {
+  if (!confirm('Are you sure? This will delete ALL published CMS overrides.')) return;
+  localStorage.removeItem(CMS_KEY);
+  _cms = {};
+  LANGS.forEach(function(l){ _cms[l] = {}; });
+  toast('CMS data cleared. Reload the site to see defaults.');
+  logAction('CMS data reset');
+}
+
+// ═══════════════════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════════════════
+function openModal(title, bodyHtml) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHtml;
+  document.getElementById('modal-bg').classList.add('vis');
+}
+function closeModal() {
+  document.getElementById('modal-bg').classList.remove('vis');
+  _editingArticle = null;
+}
+document.getElementById('modal-bg').addEventListener('click', function(e){
+  if (e.target === this) closeModal();
+});
+
+// ═══════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════
+function val(id) {
+  var el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function toast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (type === 'err' ? ' err' : '');
+  clearTimeout(t._to);
+  t._to = setTimeout(function(){ t.className = ''; }, 3000);
+}
+
+// Enter key on login
+document.getElementById('pw-input').addEventListener('keydown', function(e){
+  if (e.key === 'Enter') doLogin();
+});
+</script>
+</body>
+</html>
