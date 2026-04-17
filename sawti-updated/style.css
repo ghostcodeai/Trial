@@ -360,8 +360,8 @@ nav{
 footer{background:var(--ink);padding:4rem 2.5rem 0;}
 .ft-grid{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr;gap:3rem;}
 .ft-logo-row{display:flex;align-items:center;gap:10px;margin-bottom:1.3rem;}
-.ft-logo-badge{width:46px;height:46px;flex-shrink:0;border-radius:50%;overflow:hidden;background:rgba(255,255,255,.10);border:1.5px solid rgba(186,170,132,.35);}
-.ft-logo-img{width:40px;height:40px;object-fit:cover;}
+.ft-logo-badge{width:46px;height:46px;flex-shrink:0;border-radius:40%;overflow:hidden;background:rgba(255,255,255,.10);border:1.5px solid rgba(186,170,132,.35);}
+.ft-logo-img{width:43px;height:43px;object-fit:cover;}
 .ft-logo-en{font-family:var(--serif);font-style:italic;font-weight:600;font-size:24px;color:#fff;}
 .ft-logo-ar{font-family:var(--arabic);font-weight:500;font-size:18px;color:var(--gold);margin-left:2px;position:relative;top:2px;}
 .ft-tagline{font-size:13px;font-weight:300;color:rgba(255,255,255,.36);line-height:1.78;max-width:265px;}
